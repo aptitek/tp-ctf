@@ -1,0 +1,29 @@
+# >>> garde-fou managed >>>
+# OS & Editors
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Garde-fou & Coverage
+.garde-fou-cache/
+lcov.info
+coverage/
+*.profraw
+*.profdata
+mutants.out*/
+reports/mutation/
+.stryker-tmp/
+.mutmut-cache
+
+# Secrets & Environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# <<< garde-fou managed <<<

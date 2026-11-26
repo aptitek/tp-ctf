@@ -1,0 +1,40 @@
+# Garde-fou configuration
+schema_version = 1
+
+[project]
+name = "ctf"
+archetype = "infra"
+languages = ["shell", "yaml", "toml"]
+features = ["docker", "git-hooks", "task-runner"]
+frameworks = ["docker-compose"]
+
+[limits]
+max_file_lines = 250
+max_function_lines = 50
+max_parameters = 4
+max_cyclomatic_complexity = 10
+max_cognitive_complexity = 10
+max_nesting_depth = 4
+max_imports_per_file = 15
+max_methods_per_type = 10
+min_clone_lines = 15
+min_clone_nodes = 40
+
+[integrity]
+require_lock = true
+
+[agents]
+sync_policy = "auto"
+remote_skills = true
+
+[scanners]
+secrets = "auto"
+vulns = "auto"
+
+[paths]
+ignore_paths = ["challenges/**"]
+entrypoints = []
+
+[cache]
+enabled = true
+directory = ".garde-fou-cache"

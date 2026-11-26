@@ -1,0 +1,39 @@
+name: ecorp-overseer
+
+services:
+  overseer:
+    build:
+      context: ..
+      dockerfile: overseer/Dockerfile
+    hostname: ecorp-overseer
+    restart: unless-stopped
+    init: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    env_file:
+      - path: ../.env.example
+        required: true
+      - path: ../.env
+        required: false
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - overseer-zt-identity:/var/lib/zerotier-one
+      - ./teams.yml:/app/teams.yml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+          pids: 150
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  overseer-zt-identity:

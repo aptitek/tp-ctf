@@ -1,0 +1,65 @@
+version: "3"
+
+tasks:
+  start:
+    desc: Construit et démarre l'infrastructure E-Corp
+    cmds:
+      - docker compose up -d --build
+      - bash scripts/status.sh
+
+  enter:
+    desc: Ouvre un shell interactif dans le conteneur bastion
+    interactive: true
+    cmds:
+      - docker compose exec bastion bash -l
+
+  status:
+    desc: Affiche l'état de santé et de contrôle des zones A, B et C
+    cmds:
+      - bash scripts/status.sh
+
+  reset:
+    desc: Remet l'environnement E-Corp à zéro (volumes et conteneurs réinitialisés)
+    cmds:
+      - bash scripts/reset.sh
+
+  stop:
+    desc: Arrête les conteneurs E-Corp sans détruire les volumes
+    cmds:
+      - docker compose stop
+
+  arena:
+    desc: Démarre l'infrastructure avec le pont réseau multijoueur (profil arena)
+    cmds:
+      - docker compose --profile arena up -d --build
+      - bash scripts/status.sh
+
+  join:
+    desc: "Rejoint l'arène ZeroTier (usage: task join -- <ZT_NETWORK_ID> <TEAM_NAME>)"
+    cmds:
+      - bash scripts/arena-join.sh {{.CLI_ARGS}}
+
+  radar:
+    desc: Scanne les pairs ZeroTier et affiche l'état local des zones A, B et C
+    cmds:
+      - bash scripts/arena-radar.sh
+
+  emergency-restore:
+    desc: "Restaure un conteneur cassé avec pénalité Scorebot (usage: task emergency-restore -- <service>)"
+    cmds:
+      - bash scripts/emergency-restore.sh {{.CLI_ARGS}}
+
+  overseer:
+    desc: "Lance le Scorebot et le Dashboard formateur sur http://localhost:9000"
+    cmds:
+      - bash scripts/overseer-start.sh {{.CLI_ARGS}}
+
+  check:
+    desc: Run full Garde-fou static analysis and security gates
+    cmds:
+      - garde check
+
+  check:staged:
+    desc: Run fast incremental check on staged Git changes
+    cmds:
+      - garde check --staged --format agent

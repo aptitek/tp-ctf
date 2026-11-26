@@ -1,0 +1,21 @@
+# E-Corp Bastion Shell Profile
+
+export EDITOR="micro"
+export PAGER="less -R"
+export PS1='\[\033[1;32m\][operator@bastion\[\033[0m\] \[\033[1;34m\]\w\[\033[1;32m\]]\$\[\033[0m\] '
+
+alias ll='eza -la --git-ignore 2>/dev/null || ls -la'
+alias la='ls -la'
+alias mission='bat --style=plain ~/MISSION.md 2>/dev/null || less ~/MISSION.md'
+
+if [[ $- == *i* ]]; then
+  cat <<'BANNER'
+  ______      _____ ____  _____  _____
+ |  ____|    / ____/ __ \|  __ \|  __ \
+ | |__ _____| |   | |  | | |__) | |__) |
+ |  __|_____| |   | |  | |  _  /|  ___/
+ | |____    | |___| |__| | | \ \| |
+ |______|    \_____\____/|_|  \_\_|
+   [ BASTION OPS // tape 'mission' ou 'ecorp-radar' ]
+BANNER
+fi

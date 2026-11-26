@@ -1,0 +1,18 @@
+# >>> garde-fou managed >>>
+# VCS, Secrets & Local Caches
+.git
+.gitignore
+.garde-fou-cache
+.env
+.env.*
+*.pem
+*.key
+coverage
+lcov.info
+# <<< garde-fou managed <<<
+
+# Python Caches & Virtual Environments
+.venv
+__pycache__
+*.pyc
+

@@ -1,0 +1,12 @@
+# Liste des équipes participantes à l'Arène E-Corp
+# Remplacez les IPs par celles attribuées dans ZeroTier Central (my.zerotier.com)
+teams:
+  - id: fsociety-alpha
+    name: "fsociety Alpha"
+    ip: "10.147.20.11"
+  - id: dark-army-beta
+    name: "Dark Army Beta"
+    ip: "10.147.20.12"
+  - id: allsafe-gamma
+    name: "Allsafe Gamma"
+    ip: "10.147.20.13"

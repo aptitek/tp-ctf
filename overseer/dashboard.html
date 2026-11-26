@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E-Corp Overseer — Arena Scoreboard</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #131922;
+      --border: #263244;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --green: #3fb950;
+      --amber: #d29922;
+      --red: #f85149;
+      --purple: #a371f7;
+      --cyan: #58a6ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 1.5rem 2rem;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.45;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.06em;
+    }
+    .meta { color: var(--muted); font-size: 0.95rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .score {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 1px solid currentColor;
+    }
+    .st-up { color: var(--green); }
+    .st-overload { color: var(--amber); }
+    .st-encrypted { color: var(--purple); }
+    .st-down { color: var(--red); }
+    .owner {
+      display: block;
+      margin-top: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>E-CORP OVERSEER // ARENA LIVE</h1>
+    <div class="meta" id="meta-status" aria-live="polite">Tick #0 — En attente de données...</div>
+  </header>
+  <main>
+    <table aria-label="Tableau des scores Arena E-Corp">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Équipe</th>
+          <th scope="col">IP ZeroTier</th>
+          <th scope="col">Zone A (Vitrine)</th>
+          <th scope="col">Zone B (RH)</th>
+          <th scope="col">Zone C (Vault)</th>
+          <th scope="col">Score</th>
+        </tr>
+      </thead>
+      <tbody id="scoreboard-body">
+        <tr><td colspan="7" class="empty">Chargement du classement en cours...</td></tr>
+      </tbody>
+    </table>
+  </main>
+  <script>
+    function badgeClass(state) {
+      if (state === "UP") return "st-up";
+      if (state === "ZOMBIE OVERLOAD" || state === "DEGRADED") return "st-overload";
+      if (state === "ENCRYPTED") return "st-encrypted";
+      return "st-down";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderZoneCell(zone) {
+      const cls = badgeClass(zone.state);
+      const ownerLabel = zone.locked_by
+        ? "LOCK: " + escapeHtml(zone.locked_by)
+        : (zone.owner_token ? "OWNER: " + escapeHtml(zone.owner_token) : "NO OWNER");
+      return '<td><span class="badge ' + cls + '">' + escapeHtml(zone.state) +
+        '</span><span class="owner">' + ownerLabel + '</span></td>';
+    }
+
+    async function refreshBoard() {
+      try {
+        const res = await fetch("/api/state", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById("meta-status").textContent =
+          "Tick #" + data.tick + " — Mise à jour : " + data.updated_at + " (intervalle 15s)";
+
+        const tbody = document.getElementById("scoreboard-body");
+        if (!data.rows || data.rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="empty">Aucune équipe configurée dans overseer/teams.yml.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = data.rows.map((row, idx) =>
+          "<tr>" +
+          "<td>" + (idx + 1) + "</td>" +
+          "<td><strong>" + escapeHtml(row.name) + "</strong><span class=\"owner\">" + escapeHtml(row.team_id) + "</span></td>" +
+          "<td>" + escapeHtml(row.ip) + "</td>" +
+          renderZoneCell(row.zone_a) +
+          renderZoneCell(row.zone_b) +
+          renderZoneCell(row.zone_c) +
+          '<td class="score">' + row.score + "</td>" +
+          "</tr>"
+        ).join("");
+      } catch (_err) {
+        document.getElementById("meta-status").textContent = "Reconnexion au Scorebot...";
+      }
+    }
+
+    refreshBoard();
+    setInterval(refreshBoard, 5000);
+  </script>
+</body>
+</html>

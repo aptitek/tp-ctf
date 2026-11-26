@@ -1,0 +1,16 @@
+pre-commit:
+  parallel: true
+  commands:
+    garde:
+      run: garde check --staged --format agent
+
+commit-msg:
+  commands:
+    conventional:
+      run: garde commit-msg {1}
+
+pre-push:
+  parallel: true
+  commands:
+    garde-full:
+      run: garde check --no-cache

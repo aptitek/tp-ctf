@@ -1,0 +1,43 @@
+[tools]
+task = "3.42.1"
+jq = "1.7.1"
+
+[tasks.start]
+description = "Construit et démarre l'infrastructure E-Corp (Mode Solo)"
+run = "task start"
+
+[tasks.enter]
+description = "Ouvre un terminal interactif dans le bastion étudiant"
+run = "task enter"
+
+[tasks.status]
+description = "Affiche l'état de santé et de contrôle des zones A, B et C"
+run = "task status"
+
+[tasks.reset]
+description = "Remet l'environnement E-Corp intégralement à zéro"
+run = "task reset"
+
+[tasks.stop]
+description = "Arrête proprement l'infrastructure E-Corp"
+run = "task stop"
+
+[tasks.arena]
+description = "Démarre l'infrastructure avec le pont réseau multijoueur (profil arena)"
+run = "task arena"
+
+[tasks.join]
+description = "Rejoint l'arène ZeroTier (usage: mise run join -- <ZT_NETWORK_ID> <TEAM_NAME>)"
+run = "bash scripts/arena-join.sh"
+
+[tasks.radar]
+description = "Affiche l'identité ZeroTier, les cibles réseau et l'état des zones A, B, C"
+run = "bash scripts/arena-radar.sh"
+
+[tasks.emergency-restore]
+description = "Restaure un seul conteneur cassé avec marqueur de pénalité Scorebot"
+run = "bash scripts/emergency-restore.sh"
+
+[tasks.overseer]
+description = "Lance le Scorebot et le Dashboard formateur sur http://localhost:9000"
+run = "bash scripts/overseer-start.sh"
